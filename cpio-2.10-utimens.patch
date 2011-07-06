@@ -1,0 +1,29 @@
+diff -urNp cpio-2.10-orig/gnu/utimens.c cpio-2.10/gnu/utimens.c
+--- cpio-2.10-orig/gnu/utimens.c	2009-02-14 19:18:01.000000000 +0100
++++ cpio-2.10/gnu/utimens.c	2010-01-06 14:43:29.000000000 +0100
+@@ -122,16 +122,17 @@ gl_futimens (int fd ATTRIBUTE_UNUSED,
+     }
+ #endif
+ #if HAVE_FUTIMENS
+-  {
+-    int result = futimens (fd, timespec);
++  if (0 <= fd)
++    {
++      int result = futimens (fd, timespec);
+ # ifdef __linux__
+-    /* Work around the same bug as above.  */
+-    if (0 < result)
+-      errno = ENOSYS;
++      /* Work around the same bug as above.  */
++      if (0 < result)
++        errno = ENOSYS;
+ # endif
+-    if (result == 0 || errno != ENOSYS)
+-      return result;
+-  }
++      if (result == 0 || errno != ENOSYS)
++        return result;
++    }
+ #endif
+ 
+   /* The platform lacks an interface to set file timestamps with
